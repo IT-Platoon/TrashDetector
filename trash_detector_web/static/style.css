@@ -5,8 +5,7 @@
 
 body {
   width: 100vw;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
   margin: 0;
   padding: 0;
   background: radial-gradient(var(--light), #a0a0a0);
@@ -64,6 +63,7 @@ main {
   display: flex;
   gap: 1rem;
   flex-direction: column;
+  padding: 0.25rem;
 }
 
 .disabled {

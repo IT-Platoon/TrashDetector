@@ -5,10 +5,6 @@ const video = document.getElementById('video');
 // peer connection
 let pc = null;
 
-// data channel
-let dc = null, dcInterval = null;
-
-
 const srcVideo = document.getElementById('srcVideo');
 const videoInput = document.getElementById('videoFile');
 videoInput.addEventListener("change", function() {
@@ -25,7 +21,6 @@ select.addEventListener('change', () => {
   } else {
     videoInput.classList.add('disabled');
   }
-
 });
 
 
@@ -114,7 +109,7 @@ function start() {
         video.setAttribute('width', width.toString());
         video.setAttribute('height', height.toString());
 
-        track.applyConstraints({ frameRate: { ideal:5, max: 10 } });
+        track.applyConstraints({ frameRate: { ideal: 5, max: 10 } });
       }
 
       pc.addTrack(track, stream);
@@ -140,22 +135,18 @@ function stop() {
 
   // close transceivers
   if (pc.getTransceivers) {
-    pc.getTransceivers().forEach(function(transceiver) {
-      if (transceiver.stop) {
-        transceiver.stop();
-      }
-    });
+    pc.getTransceivers().forEach(
+      (transceiver) => transceiver?.stop?.()
+    );
   }
 
   // close local audio / video
-  pc.getSenders().forEach(function(sender) {
-    sender.track.stop();
-  });
+  pc.getSenders().forEach(
+    (sender) => sender.track.stop()
+  );
 
   // close peer connection
-  setTimeout(function() {
-    pc.close();
-  }, 500);
+  setTimeout(() => pc.close(), 500);
 }
 
 let isStart = false;
