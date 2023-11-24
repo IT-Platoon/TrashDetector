@@ -2,10 +2,10 @@ name: Trash Detector
 
 on:
   pull_request:
-    branches: ["main"]
+    branches: ["desktop"]
 
   push:
-    branches: ["main"]
+    branches: ["desktop"]
 
 concurrency:
   group: ${{ github.head_ref || github.run_id }}

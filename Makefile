@@ -1,4 +1,4 @@
-APPLICATION_NAME = trash_detector
+APPLICATION_NAME = trash_detector_desktop
 
 
 install_linux_dev: ##@Application Create Virtual Enviroment and Install Requirements on Linux for dev

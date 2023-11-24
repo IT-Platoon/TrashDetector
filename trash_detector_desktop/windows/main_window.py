@@ -3,7 +3,7 @@ import os
 import cv2
 from PyQt6 import QtCore, QtGui, QtWidgets, QtMultimedia
 
-from trash_detector.constants import (
+from trash_detector_desktop.constants import (
     ClassesLabels,
     FUNCTIONS,
     ML_MODEL,
@@ -15,10 +15,10 @@ from trash_detector.constants import (
     MethodsLoad,
     Mode,
 )
-from trash_detector.forms import Ui_DetectionWindow
-from trash_detector.ml import InferenceAPI, load_model
-from trash_detector.palettes import main_window_styles
-from trash_detector.thread import VideoThread
+from trash_detector_desktop.forms import Ui_DetectionWindow
+from trash_detector_desktop.ml import InferenceAPI, load_model
+from trash_detector_desktop.palettes import main_window_styles
+from trash_detector_desktop.thread import VideoThread
 
 
 class MainWindow(QtWidgets.QMainWindow):
