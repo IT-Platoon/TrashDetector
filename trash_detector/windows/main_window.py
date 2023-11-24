@@ -67,6 +67,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.list_labels = []
         self.cameras = None
 
+        self.player = None
+
         if hasattr(self, "classes"):
             if self.classes is not None:
                 self.classes.close()
@@ -217,10 +219,11 @@ class MainWindow(QtWidgets.QMainWindow):
     def setNewMediaWebCam(self, classes, obj, image):
         for class_ in classes:
             if class_ != self.classes.currentText():
-                player = QtMultimedia.QMediaPlayer()
-                player.setAudioOutput(QtMultimedia.QAudioOutput())
-                player.setSource(QtCore.QUrl.fromLocalFile("./media/audio.mp3"))
-                player.play()
+                if self.player is None:
+                    self.player = QtMultimedia.QMediaPlayer()
+                    self.player.setAudioOutput(QtMultimedia.QAudioOutput())
+                    self.player.setSource(QtCore.QUrl.fromLocalFile("./media/audio.mp3"))
+                    self.player.play()
                 break
         if not self.list_labels:
             label = QtWidgets.QLabel(parent=self)
