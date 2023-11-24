@@ -1,7 +1,7 @@
 import os
 
 import cv2
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtGui, QtWidgets, QtMultimedia
 
 from trash_detector.constants import (
     ClassesLabels,
@@ -213,9 +213,15 @@ class MainWindow(QtWidgets.QMainWindow):
             obj.addWidget(last_label)
             obj.addStretch()
 
-    @QtCore.pyqtSlot(QtWidgets.QWidget, QtGui.QImage)
-    def setNewMediaWebCam(self, obj, image):
-        print(self.classes.currentText())
+    @QtCore.pyqtSlot(list, QtWidgets.QWidget, QtGui.QImage)
+    def setNewMediaWebCam(self, classes, obj, image):
+        for class_ in classes:
+            if class_ != self.classes.currentText():
+                player = QtMultimedia.QMediaPlayer()
+                player.setAudioOutput(QtMultimedia.QAudioOutput())
+                player.setSource(QtCore.QUrl.fromLocalFile("./media/audio.mp3"))
+                player.play()
+                break
         if not self.list_labels:
             label = QtWidgets.QLabel(parent=self)
             self.list_labels.append(label)

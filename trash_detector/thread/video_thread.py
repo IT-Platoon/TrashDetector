@@ -9,7 +9,7 @@ from trash_detector.constants import Mode
 
 class VideoThread(QThread):
     changePixmapImageVideo = pyqtSignal(int, QWidget, QImage)
-    changePixmapWebCam = pyqtSignal(QWidget, QImage)
+    changePixmapWebCam = pyqtSignal(list, QWidget, QImage)
     finished = pyqtSignal(bool, str)
 
     def __init__(self, parent, func, args, kwargs, widget, mode) -> None:
@@ -41,9 +41,9 @@ class VideoThread(QThread):
                     frame = self.get_frame(image)
                     self.changePixmapImageVideo.emit(int(progress), self.widget, frame)
                 else:
-                    image = yielded
+                    image, classes = yielded
                     frame = self.get_frame(image)
-                    self.changePixmapWebCam.emit(self.widget, frame)
+                    self.changePixmapWebCam.emit(classes, self.widget, frame)
                 yielded = detection.send(True)
             else:
                 self.is_interruption_requested = True
