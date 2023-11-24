@@ -90,7 +90,7 @@ class InferenceAPI:
         """Запуск обработки изображений."""
         mkdir(dir_save)
 
-        dir_name = get_directory_name("image")
+        dir_name = get_directory_name("images")
         dir_save = os.path.join(dir_save, dir_name)
         mkdir(dir_save)
 
@@ -125,7 +125,7 @@ class InferenceAPI:
         flag_realtime_show_video: bool = True,
     ) -> list[dict]:
         """Запуск обработки видео.
-        
+
         return: list[dict] - результат, где словарь имеет следующий вид:
         {
             'filename': str,  # Название обработанного видео.
@@ -139,7 +139,8 @@ class InferenceAPI:
         for index, filename in enumerate(list_filenames):
             cap = cv2.VideoCapture(filename)
             # Папка для сохранения одного видео.
-            dir_name = get_directory_name("video")
+            tmp_filename = filename.split('/')[-1].replace('.', '_')
+            dir_name = get_directory_name(f"video_{tmp_filename}")
             dir_name = os.path.join(dir_save, dir_name)
             os.mkdir(dir_name)
             # Файл для логов.
@@ -202,7 +203,7 @@ class InferenceAPI:
 
     def run_detection_webcam(
         self,
-        source_webcam: str,
+        source_webcam: int,
         dir_save: str,
         logfile_name: str = 'logfile.csv',  # .csv
         flag_save_imgs: bool = False,
@@ -222,8 +223,8 @@ class InferenceAPI:
                 model.predictor.dataset.close()
                 break
 
+            classes = []
             if len(results) != 0:
-                classes = []
                 for result in results:
                     for i in result.boxes.cls:
                         classes.append(model.names[int(i)])
@@ -232,8 +233,8 @@ class InferenceAPI:
                 if len(classes) != 0:
                     datetime_now = datetime.now()
                     datetime_now = str(datetime_now)[:19].replace(':', '-')
-                    classes = list_to_str(classes)
-                    update_logfile(logfile_name, datetime_now, classes)
+                    str_classes = list_to_str(classes)
+                    update_logfile(logfile_name, datetime_now, str_classes)
 
                     # Сохранение кадров, на котором был найден объект.
                     if flag_save_imgs:
@@ -250,7 +251,7 @@ class InferenceAPI:
                     dsize=(640, 640),
                     interpolation=cv2.INTER_CUBIC,
                 )
-                go_next = yield frame
+                go_next = yield frame, classes
                 # cv2.imshow("Detection result. Exit `q`", frame)
                 # # Остановка по нажатию 'q'
                 # if cv2.waitKey(1) & 0xFF == ord("q"):
@@ -262,13 +263,18 @@ if __name__ == '__main__':
 
     list_image_filenames = os.listdir('./demo_dataset/images')
     list_image_filenames = [f'./demo_dataset/images/{i}' for i in list_image_filenames]
-    list_video_filenames = ['./demo_dataset/videos/3654189.mp4']
+    list_video_filenames = ['./demo_dataset/videos/3654189_20sec.mp4']
 
     dir_save = './temp_results'
 
-    # detection = inference.run_detection_images(list_image_filenames, dir_save)
     # detection = inference.run_detection_videos(list_video_filenames, dir_save, flag_realtime_show_video=False)
-    detection = inference.run_detection_webcam(0, dir_save, flag_save_imgs=False)
+    # try:
+    #     next(detection)
+    # except StopIteration as exception:
+    #     pass
+
+    detection = inference.run_detection_images(list_image_filenames, dir_save)
+    # detection = inference.run_detection_webcam(0, dir_save, flag_save_imgs=False)
     try:
         yielded = next(detection)
         while True:

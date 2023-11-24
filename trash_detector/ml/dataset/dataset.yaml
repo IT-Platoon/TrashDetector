@@ -2,4 +2,4 @@ train: ./train/images
 val: ./valid/images
 
 nc: 4
-names: []
+names: ['Кирпич', 'Дерево', 'Грунт', 'Бетон']
