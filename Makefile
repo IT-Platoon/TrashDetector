@@ -43,3 +43,21 @@ build_windows:  ##@Code build in Application with Pyinstaller on Windows
 
 clean:  ##@Code Clean directory from garbage files
 	sudo rm -fr *.pyc *.egg-info dist build venv
+
+
+install_windows_web:
+	./build.bat install_web
+
+run_windows_web:
+	./build.bat run_web
+
+install_linux_web:
+	python -m venv venv && \
+	. ./venv/bin/activate && \
+	pip install -Ur requirements_web.txt && \
+	cp -r ./trash_detector_desktop/ml/weights/best.pt ./trash_detector_web
+
+run_linux_web:
+	. ./venv/bin/activate && \
+	cd ./trash_detector_web && \
+	python3 -m uvicorn main:app

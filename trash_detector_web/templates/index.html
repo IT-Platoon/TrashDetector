@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang=ru">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Trash Detector</title>
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" sizes="any"/>
+  <meta name="theme-color" content="#280050"/>
+  <meta name="color-scheme" content="dark"/>
+  
+  <link rel="stylesheet" href="/static/style.css"/>
+  <script src="/static/script.js" defer></script>
+</head>
+<body>
+
+<main>
+  <audio id="audio" autoplay></audio>
+  <video id="video" autoplay playsinline></video>
+
+  <div class="options">
+  <label class="source">
+    Источник
+    <select id="select">
+      <option value="webcam" selected>Веб-камера</option>
+      <option value="video">Видео файл</option>
+    </select>
+  </label>
+
+  <video
+    id="srcVideo"
+    playsinline
+    muted
+    tabindex="-1"
+    style="visibility: hidden; position: absolute"
+  ></video>
+  <input
+    id="videoFile"
+    type="file"
+    accept="video/*"
+    class="disabled"
+  />
+
+  <button id="toggle">Запустить</button>
+</div>
+
+</main>
+</body>
+</html>
