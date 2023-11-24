@@ -12,6 +12,9 @@ import numpy as np
 import torch
 from ultralytics import YOLO
 
+import supervision as sv
+from supervision.draw.color import ColorPalette
+
 
 def load_model(path: str) -> YOLO:
     """ Загрузка модели.
@@ -85,3 +88,86 @@ def convert_images_to_video(
 
     video.release()
     return video
+
+
+def create_beautiful_bbox(
+        model,
+        results,
+        box_annotator: sv.BoxAnnotator
+):
+    """"""
+    if isinstance(results, list):
+        result = results[0]
+    else:
+        result = results
+
+    scene = result.orig_img
+    detections = sv.Detections.from_ultralytics(result)
+    labels = [
+        f"{model.names[class_id]} {confidence:0.2f}"
+        for _, _, confidence, class_id, _
+        in detections
+    ]
+
+    # Дальше код скопирован из либы supervision с фиксом для русского:
+
+    font = cv2.FONT_HERSHEY_COMPLEX
+    for i in range(len(detections)):
+        x1, y1, x2, y2 = detections.xyxy[i].astype(int)
+        class_id = (
+            detections.class_id[i] if detections.class_id is not None else None
+        )
+        idx = class_id if class_id is not None else i
+        color = (
+            box_annotator.color.by_idx(idx)
+            if isinstance(box_annotator.color, ColorPalette)
+            else box_annotator.color
+        )
+        cv2.rectangle(
+            img=scene,
+            pt1=(x1, y1),
+            pt2=(x2, y2),
+            color=color.as_bgr(),
+            thickness=box_annotator.thickness,
+        )
+
+        text = (
+            f"{class_id}"
+            if (labels is None or len(detections) != len(labels))
+            else labels[i]
+        )
+
+        text_width, text_height = cv2.getTextSize(
+            text=text,
+            fontFace=font,
+            fontScale=box_annotator.text_scale,
+            thickness=box_annotator.text_thickness,
+        )[0]
+
+        text_x = x1 + box_annotator.text_padding
+        text_y = y1 - box_annotator.text_padding
+
+        text_background_x1 = x1
+        text_background_y1 = y1 - 2 * box_annotator.text_padding - text_height
+
+        text_background_x2 = x1 + 2 * box_annotator.text_padding + text_width
+        text_background_y2 = y1
+
+        cv2.rectangle(
+            img=scene,
+            pt1=(text_background_x1, text_background_y1),
+            pt2=(text_background_x2, text_background_y2),
+            color=color.as_bgr(),
+            thickness=cv2.FILLED,
+        )
+        cv2.putText(
+            img=scene,
+            text=text,
+            org=(text_x, text_y),
+            fontFace=font,
+            fontScale=box_annotator.text_scale,
+            color=box_annotator.text_color.as_rgb(),
+            thickness=box_annotator.text_thickness,
+            lineType=cv2.LINE_AA,
+        )
+    return scene
