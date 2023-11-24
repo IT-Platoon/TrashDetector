@@ -20,6 +20,10 @@ class InferenceAPI:
         model: YOLO | str,
         conf: float = 0.25,
         iou: float = 0.7,
+
+        box_thickness: int = 2,
+        text_thickness: int = 1,
+        text_scale: float = 0.7,
     ):
         if isinstance(model, YOLO):
             self.model = model
@@ -29,10 +33,16 @@ class InferenceAPI:
         self.conf = conf
         self.iou = iou
 
+        self.box_annotator = sv.BoxAnnotator(
+            thickness=box_thickness,
+            text_thickness=text_thickness,
+            text_scale=text_scale,
+        )
+
     def predict_one(
         self,
         filename: str,
-        analyzer: Callable[[list, list], Optional[tuple]] = analyse_target_class_without_changes,
+        analyzer: Callable[[list, list], Optional[tuple]] = analyse_target_class_by_count,
     ) -> dict:
         """ Предсказание.
         filename: str - путь или url до одного изображения.
@@ -53,7 +63,8 @@ class InferenceAPI:
         result = model.predict(filename, conf=self.conf, iou=self.iou, verbose=False)[0]
 
         # Преобразую результат в изображение с box.
-        img = result.plot()
+        img = create_beautiful_bbox(model, result, self.box_annotator)
+        # img = result.plot()
 
         # Получаю классы, которые есть на изображении.
         classes = []
@@ -154,7 +165,8 @@ class InferenceAPI:
                 success, frame = cap.read()
                 if success:
                     results = model.predict(frame, conf=self.conf, iou=self.iou, verbose=False)
-                    annotated_frame = results[0].plot()
+                    annotated_frame = create_beautiful_bbox(model, results[0], self.box_annotator)
+                    # annotated_frame = results[0].plot()
                     lst_images.append(annotated_frame)
 
                     classes = []
@@ -218,7 +230,7 @@ class InferenceAPI:
         os.mkdir(dir_save)
         logfile_name = os.path.join(dir_save, logfile_name)
         go_next = True
-        for results in model.predict(source_webcam, stream=True, conf=self.conf, iou=self.iou):
+        for results in model.predict(source_webcam, stream=True, conf=self.conf, iou=self.iou, verbose=False):
             if not go_next:
                 model.predictor.dataset.close()
                 break
@@ -239,13 +251,16 @@ class InferenceAPI:
                     # Сохранение кадров, на котором был найден объект.
                     if flag_save_imgs:
                         path = os.path.join(dir_save, datetime_now + '.jpg')
-                        image = cv2.cvtColor(results.plot(), cv2.COLOR_BGR2RGB)
+                        image = create_beautiful_bbox(model, results, self.box_annotator)
+                        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                         image = np.array(image)
                         plt.imsave(path, image)
 
             if flag_realtime_show_video:
                 # Изменяю изображение для корректного отображения.
-                frame = results.plot()
+
+                frame = create_beautiful_bbox(model, results, self.box_annotator)
+                # frame = results.plot()
                 frame = cv2.resize(
                     frame,
                     dsize=(640, 640),
@@ -273,8 +288,8 @@ if __name__ == '__main__':
     # except StopIteration as exception:
     #     pass
 
-    detection = inference.run_detection_images(list_image_filenames, dir_save)
-    # detection = inference.run_detection_webcam(0, dir_save, flag_save_imgs=False)
+    # detection = inference.run_detection_images(list_image_filenames, dir_save)
+    detection = inference.run_detection_webcam(0, dir_save, flag_save_imgs=False)
     try:
         yielded = next(detection)
         while True:
