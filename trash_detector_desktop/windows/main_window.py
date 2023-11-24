@@ -267,10 +267,15 @@ class MainWindow(QtWidgets.QMainWindow):
         args = (self.files, self.directory_to_save)
         kwargs = {}
         if self.mode == Mode.WEBCAM:
-            self.player = QtMultimedia.QMediaPlayer()
-            audio = QtMultimedia.QAudioOutput()
-            self.player.setAudioOutput(audio)
-            self.player.setSource(QtCore.QUrl.fromLocalFile("./media/audio.mp3"))
+            # self.player = QtMultimedia.QMediaPlayer()
+            # audio = QtMultimedia.QAudioOutput()
+            # self.player.setAudioOutput(audio)
+            # audio.setVolume(50)
+            # self.player.setSource(QtCore.QUrl.fromLocalFile("./media/audio.mp3"))
+            self.player = QtMultimedia.QSoundEffect()
+            self.player.setSource(QtCore.QUrl.fromLocalFile("audio.wav"))
+            self.player.setLoopCount(1)
+            self.player.play()
             kwargs.update({"flag_save_imgs": True})
         self.video_thread = VideoThread(
             self,
