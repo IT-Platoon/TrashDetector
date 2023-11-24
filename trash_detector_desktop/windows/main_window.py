@@ -216,11 +216,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot(list, QtWidgets.QWidget, QtGui.QImage)
     def setNewMediaWebCam(self, classes, obj, image):
-        for class_ in classes:
-            if class_ != self.classes.currentText():
-                if self.player is None:
-                    self.player.play()
-                break
+        if self.classes.currentText() != ClassesLabels.NOTHING:
+            for class_ in classes:
+                if class_ != self.classes.currentText():
+                    if self.player is None:
+                        self.player.play()
+                    break
         if not self.list_labels:
             label = QtWidgets.QLabel(parent=self)
             self.list_labels.append(label)
@@ -267,14 +268,11 @@ class MainWindow(QtWidgets.QMainWindow):
         args = (self.files, self.directory_to_save)
         kwargs = {}
         if self.mode == Mode.WEBCAM:
-            # self.player = QtMultimedia.QMediaPlayer()
-            # audio = QtMultimedia.QAudioOutput()
-            # self.player.setAudioOutput(audio)
-            # audio.setVolume(50)
-            # self.player.setSource(QtCore.QUrl.fromLocalFile("./media/audio.mp3"))
-            self.player = QtMultimedia.QSoundEffect()
-            self.player.setSource(QtCore.QUrl.fromLocalFile("audio.wav"))
-            self.player.setLoopCount(1)
+            self.player = QtMultimedia.QMediaPlayer()
+            audio = QtMultimedia.QAudioOutput()
+            self.player.setAudioOutput(audio)
+            audio.setVolume(50)
+            self.player.setSource(QtCore.QUrl.fromLocalFile("audio.mp3"))
             self.player.play()
             kwargs.update({"flag_save_imgs": True})
         self.video_thread = VideoThread(
