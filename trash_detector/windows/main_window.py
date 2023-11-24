@@ -66,7 +66,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.video_thread = None
         self.list_labels = []
         self.cameras = None
-
         self.player = None
 
         if hasattr(self, "classes"):
@@ -220,9 +219,6 @@ class MainWindow(QtWidgets.QMainWindow):
         for class_ in classes:
             if class_ != self.classes.currentText():
                 if self.player is None:
-                    self.player = QtMultimedia.QMediaPlayer()
-                    self.player.setAudioOutput(QtMultimedia.QAudioOutput())
-                    self.player.setSource(QtCore.QUrl.fromLocalFile("./media/audio.mp3"))
                     self.player.play()
                 break
         if not self.list_labels:
@@ -271,6 +267,10 @@ class MainWindow(QtWidgets.QMainWindow):
         args = (self.files, self.directory_to_save)
         kwargs = {}
         if self.mode == Mode.WEBCAM:
+            self.player = QtMultimedia.QMediaPlayer()
+            audio = QtMultimedia.QAudioOutput()
+            self.player.setAudioOutput(audio)
+            self.player.setSource(QtCore.QUrl.fromLocalFile("./media/audio.mp3"))
             kwargs.update({"flag_save_imgs": True})
         self.video_thread = VideoThread(
             self,
