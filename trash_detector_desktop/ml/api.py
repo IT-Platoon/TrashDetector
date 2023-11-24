@@ -9,7 +9,7 @@ from typing import Callable
 import cv2
 from ultralytics import YOLO
 
-from utils import *
+from .utils import *
 
 
 class InferenceAPI:
