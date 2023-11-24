@@ -2,8 +2,8 @@ import sys
 
 from PyQt6 import QtWidgets
 
-from trash_detector.constants import MAIN_WINDOW_TITLE
-from trash_detector.windows import MainWindow
+from trash_detector_desktop.constants import MAIN_WINDOW_TITLE
+from trash_detector_desktop.windows import MainWindow
 
 
 if __name__ == "__main__":

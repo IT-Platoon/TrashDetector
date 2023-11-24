@@ -3,7 +3,7 @@ import os
 import cv2
 from PyQt6 import QtCore, QtGui, QtWidgets, QtMultimedia
 
-from trash_detector.constants import (
+from trash_detector_desktop.constants import (
     ClassesLabels,
     FUNCTIONS,
     ML_MODEL,
@@ -15,10 +15,10 @@ from trash_detector.constants import (
     MethodsLoad,
     Mode,
 )
-from trash_detector.forms import Ui_DetectionWindow
-from trash_detector.ml import InferenceAPI, load_model
-from trash_detector.palettes import main_window_styles
-from trash_detector.thread import VideoThread
+from trash_detector_desktop.forms import Ui_DetectionWindow
+from trash_detector_desktop.ml import InferenceAPI, load_model
+from trash_detector_desktop.palettes import main_window_styles
+from trash_detector_desktop.thread import VideoThread
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -66,6 +66,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.video_thread = None
         self.list_labels = []
         self.cameras = None
+        self.player = None
 
         if hasattr(self, "classes"):
             if self.classes is not None:
@@ -217,10 +218,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def setNewMediaWebCam(self, classes, obj, image):
         for class_ in classes:
             if class_ != self.classes.currentText():
-                player = QtMultimedia.QMediaPlayer()
-                player.setAudioOutput(QtMultimedia.QAudioOutput())
-                player.setSource(QtCore.QUrl.fromLocalFile("./media/audio.mp3"))
-                player.play()
+                if self.player is None:
+                    self.player.play()
                 break
         if not self.list_labels:
             label = QtWidgets.QLabel(parent=self)
@@ -268,6 +267,10 @@ class MainWindow(QtWidgets.QMainWindow):
         args = (self.files, self.directory_to_save)
         kwargs = {}
         if self.mode == Mode.WEBCAM:
+            self.player = QtMultimedia.QMediaPlayer()
+            audio = QtMultimedia.QAudioOutput()
+            self.player.setAudioOutput(audio)
+            self.player.setSource(QtCore.QUrl.fromLocalFile("./media/audio.mp3"))
             kwargs.update({"flag_save_imgs": True})
         self.video_thread = VideoThread(
             self,

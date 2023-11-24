@@ -8,7 +8,7 @@ a = Analysis(
     ['trash_detector/__main__.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('trash_detector/media/audio.mp3', 'media/')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

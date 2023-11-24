@@ -4,7 +4,7 @@ from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtGui import QImage
 from PyQt6.QtWidgets import QWidget
 
-from trash_detector.constants import Mode
+from trash_detector_desktop.constants import Mode
 
 
 class VideoThread(QThread):
