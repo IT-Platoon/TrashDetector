@@ -1,0 +1,95 @@
+name: Trash Detector
+
+on:
+  pull_request:
+    branches: ["main"]
+
+  push:
+    branches: ["main"]
+
+concurrency:
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  upload-release:
+    runs-on: ubuntu-latest
+    needs: [build-windows, build-linux]
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set current date as env variable
+        run: echo "date_today=$(date +'%Y.%m.%d/%H.%M')" >> $GITHUB_ENV
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: uploads
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            trash_detector_windows.zip
+            trash_detector_linux.tar.gz
+          name: Trash Detector - ${{ env.date_today }}
+          tag_name: d/${{ env.date_today }}
+
+
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Build
+        run: make build_linux
+        
+      - name: Create archive
+        run: tar -czf trash_detector_linux.tar.gz dist/*
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: uploads
+          path: trash_detector_linux.tar.gz
+          retention-days: 1
+
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install requirements
+        run: ./build.bat install
+        
+      - name: Build
+        run: ./build.bat build
+        
+      - name: Create archive
+        run: Compress-Archive -Path dist/* -Destination trash_detector_windows.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: uploads
+          path: trash_detector_windows.zip
+          retention-days: 1
