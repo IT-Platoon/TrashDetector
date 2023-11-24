@@ -9,7 +9,7 @@ from typing import Callable
 import cv2
 from ultralytics import YOLO
 
-from .utils import *
+from utils import *
 
 
 class InferenceAPI:
@@ -207,47 +207,44 @@ class InferenceAPI:
         logfile_name: str = 'logfile.csv',  # .csv
         flag_save_imgs: bool = False,
         flag_realtime_show_video: bool = True,
-    ) -> np.ndarray:
+    ) -> None:
         """Запуск детектирования в реальном времени по веб-камере."""
         model = self.model
         mkdir(dir_save)
-        source_webcam = int(source_webcam)
 
         dir_name = get_directory_name(f'camera{source_webcam}')
         dir_save = os.path.join(dir_save, dir_name)
         os.mkdir(dir_save)
         logfile_name = os.path.join(dir_save, logfile_name)
-
-        cap = cv2.VideoCapture(source_webcam)
         go_next = True
-        while cap.isOpened() and go_next:
-            success, frame = cap.read()
-            if success:
-                results = model.predict(frame, conf=self.conf, iou=self.iou, verbose=False)
-                result = results[0]
-                frame = result.plot()
+        for results in model.predict(source_webcam, stream=True, conf=self.conf, iou=self.iou):
+            if not go_next:
+                model.predictor.dataset.close()
+                break
 
-                if len(results) != 0:
-                    classes = []
+            if len(results) != 0:
+                classes = []
+                for result in results:
                     for i in result.boxes.cls:
                         classes.append(model.names[int(i)])
 
-                    # Логгируем найденные объекты с вебкамеры.
-                    if len(classes) != 0:
-                        datetime_now = datetime.now()
-                        datetime_now = str(datetime_now)[:19].replace(':', '-')
-                        classes = list_to_str(classes)
-                        update_logfile(logfile_name, datetime_now, classes)
+                # Логгируем найденные объекты с вебкамеры.
+                if len(classes) != 0:
+                    datetime_now = datetime.now()
+                    datetime_now = str(datetime_now)[:19].replace(':', '-')
+                    classes = list_to_str(classes)
+                    update_logfile(logfile_name, datetime_now, classes)
 
-                        # Сохранение кадров, на котором был найден объект.
-                        if flag_save_imgs:
-                            path = os.path.join(dir_save, datetime_now + '.jpg')
-                            image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                            image = np.array(image)
-                            plt.imsave(path, image)
+                    # Сохранение кадров, на котором был найден объект.
+                    if flag_save_imgs:
+                        path = os.path.join(dir_save, datetime_now + '.jpg')
+                        image = cv2.cvtColor(results.plot(), cv2.COLOR_BGR2RGB)
+                        image = np.array(image)
+                        plt.imsave(path, image)
 
             if flag_realtime_show_video:
                 # Изменяю изображение для корректного отображения.
+                frame = results.plot()
                 frame = cv2.resize(
                     frame,
                     dsize=(640, 640),
@@ -265,7 +262,7 @@ if __name__ == '__main__':
 
     list_image_filenames = os.listdir('./demo_dataset/images')
     list_image_filenames = [f'./demo_dataset/images/{i}' for i in list_image_filenames]
-    list_video_filenames = ['./demo_dataset/videos/чвк.mp4']
+    list_video_filenames = ['./demo_dataset/videos/3654189.mp4']
 
     dir_save = './temp_results'
 
@@ -273,7 +270,8 @@ if __name__ == '__main__':
     # detection = inference.run_detection_videos(list_video_filenames, dir_save, flag_realtime_show_video=False)
     detection = inference.run_detection_webcam(0, dir_save, flag_save_imgs=False)
     try:
+        yielded = next(detection)
         while True:
-            next(detection)
+            yielded = detection.send(True)
     except StopIteration as exception:
         pass
