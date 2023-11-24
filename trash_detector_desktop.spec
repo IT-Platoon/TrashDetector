@@ -5,10 +5,10 @@ block_cipher = None
 
 
 a = Analysis(
-    ['trash_detector/__main__.py'],
+    ['trash_detector_desktop/__main__.py'],
     pathex=[],
     binaries=[],
-    datas=[('trash_detector/media/audio.mp3', 'media/')],
+    datas=[('trash_detector_desktop/media/audio.mp3', 'media/')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -26,8 +26,8 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='trash_detector_app',
-    contents_directory='trash_detector',
+    name='trash_detector_desktop_app',
+    contents_directory='trash_detector_desktop',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -47,5 +47,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='trash_detector',
+    name='trash_detector_desktop',
 )
