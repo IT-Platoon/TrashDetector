@@ -7,7 +7,7 @@ goto %1
   call "venv/Scripts/activate.bat"
   pip install -Ur requirements.txt
   pip install torch torchvision --extra-index-url https://download.pytorch.org/whl/cpu
-	pip install ultralytics
+	pip install ultralytics==8.0.202
 	pip install dill
   pip install lapx
 goto end

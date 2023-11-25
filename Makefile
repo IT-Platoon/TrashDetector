@@ -11,7 +11,7 @@ install_linux: ##@Application Create Virtual Enviroment and Install Requirements
 	. ./venv/bin/activate && \
 	pip install -Ur requirements.txt && \
 	pip install torch torchvision --extra-index-url https://download.pytorch.org/whl/cpu && \
-	pip install ultralytics && \
+	pip install ultralytics==8.0.202 && \
 	pip install dill
 
 install_windows: ##@Application Create Virtual Enviroment and Install Requirements on Windows
