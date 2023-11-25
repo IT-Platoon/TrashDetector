@@ -31,21 +31,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setStyleSheet(main_window_styles)
         self.ui.select_files.currentTextChanged.connect(self.add_combo_box_webcam)
         self.init_variable()
-        self.player = QtMultimedia.QMediaPlayer()
-        self.audio = QtMultimedia.QAudioOutput()
-        self.player.setAudioOutput(self.audio)
-        self.audio.setVolume(50)
-        self.player.setSource(QtCore.QUrl.fromLocalFile("trash_detector_desktop/audio.mp3"))
-        self.player.play()
-        self.player.setSource(QtCore.QUrl.fromLocalFile("./audio.mp3"))
-        self.player.play()
-        print(self.player)
-        print(self.audio)
-        print(self.player.hasAudio())  # true
-        print(self.player.isPlaying())
 
     def add_combo_box_webcam(self, text):
-        self.player.play()
         if text == MethodsLoad.WEBCAM:
             cameras = self.get_available_cameras()
             if cameras:
@@ -64,6 +51,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 )
                 self.ui.select_files.setCurrentIndex(0)
         else:
+            if self.classes is not None:
+                self.classes.close()
+                self.classes = None
             if self.available_cameras is not None:
                 self.available_cameras.close()
                 self.available_cameras = None
@@ -79,6 +69,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.video_thread = None
         self.list_labels = []
         self.cameras = None
+
+        self.player = QtMultimedia.QMediaPlayer()
+        self.audio = QtMultimedia.QAudioOutput()
+        self.player.setAudioOutput(self.audio)
+        self.audio.setVolume(50)
+        self.player.setSource(
+            QtCore.QUrl.fromLocalFile("trash_detector_desktop/media/audio.mp3"),
+        )
 
         if hasattr(self, "classes"):
             if self.classes is not None:
@@ -231,7 +229,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.classes.currentText() != ClassesLabels.NOTHING:
             for class_ in classes:
                 if class_ != self.classes.currentText():
-                    if self.player is None:
+                    if not self.player.isPlaying():
                         self.player.play()
                     break
         if not self.list_labels:
