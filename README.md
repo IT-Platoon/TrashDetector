@@ -4,7 +4,7 @@
 
 ### Датасеты и веса: https://drive.google.com/drive/folders/1N4Dv6JZApnSa5WUZA-FRq5hyIRXjP0rO?usp=sharing
 
-### Так же присутствует модель для использования в ```trash_detector_desktop/ml/weights```
+### Так же присутствует модель для использования в ```trash_detector_desktop/ml/weights``` и в ```trash_detector_web```
 
 ## Установка
 

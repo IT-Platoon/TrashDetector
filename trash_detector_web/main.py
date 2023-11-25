@@ -22,7 +22,7 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-model = YOLO('best.pt').to("cpu")
+model = YOLO('full_dataset_yolo8s.pt').to("cpu")
 
 
 class VideoTransformTrack(MediaStreamTrack):
