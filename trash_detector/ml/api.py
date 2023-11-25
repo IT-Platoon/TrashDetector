@@ -95,7 +95,7 @@ class InferenceAPI:
         self,
         list_filenames: list[str],
         dir_save: str,
-        analyzer: Callable[[list, list], Optional[str]] = analyse_target_class_without_changes,
+        analyzer: Callable[[list, list], Optional[str]] = analyse_target_class_by_count,
         logfile_name: str = 'logfile.csv',  # .csv
     ) -> list[dict]:
         """Запуск обработки изображений."""
@@ -112,8 +112,7 @@ class InferenceAPI:
             final_dict = self.predict_one(filename, analyzer=analyzer)
 
             # Сохранение лог-файла.
-            target = list_to_str(final_dict['target_class'])
-            update_logfile(logfile_name, final_dict['filename'], target)
+            update_logfile(logfile_name, final_dict['filename'], final_dict['target_class'], final_dict['conf'])
 
             list_final_dict.append(final_dict)
             frame = cv2.resize(
@@ -134,6 +133,7 @@ class InferenceAPI:
         logfile_name: str = 'logfile.csv',  # .csv
         fps_video_save: int = 24,
         flag_realtime_show_video: bool = True,
+        analyzer: Callable[[list, list], Optional[str]] = analyse_target_class_by_count,
     ) -> list[dict]:
         """Запуск обработки видео.
 
@@ -173,11 +173,15 @@ class InferenceAPI:
                     for i in results[0].boxes.cls:
                         classes.append(model.names[int(i)])
 
+                    conf = []
+                    for i in results[0].boxes.conf:
+                        conf.append(i)
+
                     # Логгируем найденные объекты на видео.
                     if len(classes) != 0:
                         info = f'{count_frame // fps_video_save} sec'
-                        classes = list_to_str(classes)
-                        update_logfile(logfile_name_i, info, classes)
+                        best_class, conf = analyzer(classes, conf)
+                        update_logfile(logfile_name_i, info, best_class, conf)
 
                     if flag_realtime_show_video:
                         # Изменяю изображение для корректного отображения.
@@ -212,7 +216,7 @@ class InferenceAPI:
             cap.release()
             cv2.destroyAllWindows()
         return paths
-
+ 
     def run_detection_webcam(
         self,
         source_webcam: int,
@@ -220,6 +224,7 @@ class InferenceAPI:
         logfile_name: str = 'logfile.csv',  # .csv
         flag_save_imgs: bool = False,
         flag_realtime_show_video: bool = True,
+        analyzer: Callable[[list, list], Optional[str]] = analyse_target_class_by_count,
     ) -> None:
         """Запуск детектирования в реальном времени по веб-камере."""
         model = self.model
@@ -236,17 +241,20 @@ class InferenceAPI:
                 break
 
             classes = []
+            conf = []
             if len(results) != 0:
                 for result in results:
                     for i in result.boxes.cls:
                         classes.append(model.names[int(i)])
+                    for i in result.boxes.conf:
+                        conf.append(i)
 
                 # Логгируем найденные объекты с вебкамеры.
                 if len(classes) != 0:
                     datetime_now = datetime.now()
                     datetime_now = str(datetime_now)[:19].replace(':', '-')
-                    str_classes = list_to_str(classes)
-                    update_logfile(logfile_name, datetime_now, str_classes)
+                    best_class, conf = analyzer(classes, conf)
+                    update_logfile(logfile_name, datetime_now, best_class, conf)
 
                     # Сохранение кадров, на котором был найден объект.
                     if flag_save_imgs:
