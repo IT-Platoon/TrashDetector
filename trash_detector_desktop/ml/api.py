@@ -150,7 +150,7 @@ class InferenceAPI:
         for index, filename in enumerate(list_filenames):
             cap = cv2.VideoCapture(filename)
             # Папка для сохранения одного видео.
-            tmp_filename = filename.split('/')[-1].replace('.', '_')
+            tmp_filename = os.path.split(filename)[-1].replace('.', '_')
             dir_name = get_directory_name(f"video_{tmp_filename}")
             dir_name = os.path.join(dir_save, dir_name)
             os.mkdir(dir_name)
