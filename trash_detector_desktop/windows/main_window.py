@@ -31,8 +31,21 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setStyleSheet(main_window_styles)
         self.ui.select_files.currentTextChanged.connect(self.add_combo_box_webcam)
         self.init_variable()
+        self.player = QtMultimedia.QMediaPlayer()
+        self.audio = QtMultimedia.QAudioOutput()
+        self.player.setAudioOutput(self.audio)
+        self.audio.setVolume(50)
+        self.player.setSource(QtCore.QUrl.fromLocalFile("trash_detector_desktop/audio.mp3"))
+        self.player.play()
+        self.player.setSource(QtCore.QUrl.fromLocalFile("./audio.mp3"))
+        self.player.play()
+        print(self.player)
+        print(self.audio)
+        print(self.player.hasAudio())  # true
+        print(self.player.isPlaying())
 
     def add_combo_box_webcam(self, text):
+        self.player.play()
         if text == MethodsLoad.WEBCAM:
             cameras = self.get_available_cameras()
             if cameras:
@@ -66,7 +79,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.video_thread = None
         self.list_labels = []
         self.cameras = None
-        self.player = None
 
         if hasattr(self, "classes"):
             if self.classes is not None:
@@ -268,12 +280,6 @@ class MainWindow(QtWidgets.QMainWindow):
         args = (self.files, self.directory_to_save)
         kwargs = {}
         if self.mode == Mode.WEBCAM:
-            self.player = QtMultimedia.QMediaPlayer()
-            audio = QtMultimedia.QAudioOutput()
-            self.player.setAudioOutput(audio)
-            audio.setVolume(50)
-            self.player.setSource(QtCore.QUrl.fromLocalFile("audio.mp3"))
-            self.player.play()
             kwargs.update({"flag_save_imgs": True})
         self.video_thread = VideoThread(
             self,
