@@ -95,7 +95,7 @@ class InferenceAPI:
         self,
         list_filenames: list[str],
         dir_save: str,
-        analyzer: Callable[[list, list], Optional[str]] = analyse_target_class_without_changes,
+        analyzer: Callable[[list, list], Optional[str]] = analyse_target_class_by_count,
         logfile_name: str = 'logfile.csv',  # .csv
     ) -> list[dict]:
         """Запуск обработки изображений."""
