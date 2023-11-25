@@ -1,4 +1,4 @@
-set APPLICATION_NAME=trash_detector
+set APPLICATION_NAME=trash_detector_desktop
 
 goto %1
 
