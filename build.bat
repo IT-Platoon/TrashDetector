@@ -9,6 +9,7 @@ goto %1
   pip install torch torchvision --extra-index-url https://download.pytorch.org/whl/cpu
 	pip install ultralytics
 	pip install dill
+  pip install lapx
 goto end
   
 :build
