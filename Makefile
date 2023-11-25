@@ -54,8 +54,7 @@ run_windows_web:
 install_linux_web:
 	python -m venv venv && \
 	. ./venv/bin/activate && \
-	pip install -Ur requirements_web.txt && \
-	cp -r ./trash_detector_desktop/ml/weights/best.pt ./trash_detector_web
+	pip install -Ur requirements_web.txt
 
 run_linux_web:
 	. ./venv/bin/activate && \

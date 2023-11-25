@@ -22,7 +22,6 @@ goto end
   python -m venv venv
   call "venv/Scripts/activate.bat"
   pip install -Ur requirements_web.txt
-  cp -r ./trash_detector_desktop/ml/weights/best.pt ./trash_detector_web
 goto end
   
 :run_web
