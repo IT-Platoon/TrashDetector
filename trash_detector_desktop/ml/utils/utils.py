@@ -39,13 +39,6 @@ def get_directory_name(detection_type: str) -> str:
     return f"detection_{detection_type}_{''.join(now_datetime)}"
 
 
-def list_to_str(value: Union[list, str]) -> str:
-    """Преобразование списка в строку."""
-    if isinstance(value, list):
-        value = f"[{', '.join(value)}]"
-    return value
-
-
 def mkdir(dir_save: str) -> None:
     """Создание директории, если ещё не создана."""
     if not os.path.isdir(dir_save):
@@ -69,9 +62,9 @@ def save_imgs(list_final_dict: list[dict], dir_save: str) -> list[dict]:
 
 
 def convert_images_to_video(
-        images: list[np.ndarray],
-        filename: str,
-        fps: int = 24,
+    images: list[np.ndarray],
+    filename: str,
+    fps: int = 24,
 ) -> cv2.VideoWriter:
     """ Соединение изображений в одно видео.
     images: np.array - массив изображений.
@@ -91,9 +84,9 @@ def convert_images_to_video(
 
 
 def create_beautiful_bbox(
-        model,
-        results,
-        box_annotator: sv.BoxAnnotator
+    model,
+    results,
+    box_annotator: sv.BoxAnnotator
 ):
     """"""
     if isinstance(results, list):

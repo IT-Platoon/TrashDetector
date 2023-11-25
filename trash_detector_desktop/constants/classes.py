@@ -7,4 +7,3 @@ class ClassesLabels(Enum):
     PRIMING = "Грунт"
     TREE = "Дерево"
     BRICK = "Кирпич"
-    ALL = "Все"

@@ -99,6 +99,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.stop_detection = None
         self.ui.select_files.setCurrentIndex(0)
         self.show_result = False
+        self.ui.load_button.setEnabled(True)
+        self.ui.tabWidget.setTabEnabled(0, True)
     
     def get_available_cameras(self) -> list[tuple[int, str]]:
         is_working = True
@@ -140,7 +142,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self,
             f"Выберите {media_type}",
             "/",
-            f"{media} ({extensions})",
+            f"{media} ({' '.join(extensions)})",
         )
 
     def get_directory(self, method_load, extensions_images, extensions_videos):
@@ -156,20 +158,22 @@ class MainWindow(QtWidgets.QMainWindow):
                 "/",
             )
             files = os.listdir(directory_to_load)
+            normal_extensions = tuple([extension[1:] for extension in extensions])
             self.files = [
                 os.path.join(directory_to_load, file)
                 for file in files
-                if file.endswith(extensions)
+                if file.endswith(normal_extensions)
             ]
         except FileNotFoundError:
             pass
 
     @QtCore.pyqtSlot()
     def on_load_button_clicked(self) -> None:
+        self.ui.tabWidget.setTabEnabled(0, False)
         self.ui.load_button.setEnabled(False)
         conf, iou = self.ui.conf.value(), self.ui.iou.value()
-        right_extensions_images = " ".join(["*.jpeg", "*.jpg", "*.png"])
-        right_extensions_videos = " ".join(["*.mp4"])
+        right_extensions_images = ("*.jpeg", "*.jpg", "*.png")
+        right_extensions_videos = ("*.mp4",)
         method_load = self.ui.select_files.currentText()
         if method_load in (MethodsLoad.GET_FILES_IMAGES, MethodsLoad.GET_FILES_VIDEOS):
             self.get_files(method_load, right_extensions_images, right_extensions_videos)
@@ -197,9 +201,12 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.compute_result()
             else:
                 self.get_critical_window("Ошибка!", SELECT_MODEL_FAILED)
+                self.ui.load_button.setEnabled(True)
+                self.ui.tabWidget.setTabEnabled(0, True)
         else:
             self.get_critical_window("Ошибка!", SELECT_FILES_FAILED)
-        self.ui.load_button.setEnabled(True)
+            self.ui.load_button.setEnabled(True)
+            self.ui.tabWidget.setTabEnabled(0, True)
 
     @QtCore.pyqtSlot(int, QtWidgets.QWidget, QtGui.QImage)
     def setNewMediaImageVideo(self, progress, obj, image):
@@ -226,7 +233,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot(list, QtWidgets.QWidget, QtGui.QImage)
     def setNewMediaWebCam(self, classes, obj, image):
-        if self.classes.currentText() != ClassesLabels.NOTHING:
+        if self.classes.currentText() != ClassesLabels.NOTHING.value:
             for class_ in classes:
                 if class_ != self.classes.currentText():
                     if not self.player.isPlaying():

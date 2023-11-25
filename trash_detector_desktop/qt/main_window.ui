@@ -49,7 +49,7 @@
               <string/>
              </property>
              <property name="icon">
-              <iconset resource="resources.qrc">
+              <iconset>
                <normaloff>:/icons/icons/download.png</normaloff>:/icons/icons/download.png</iconset>
              </property>
              <property name="iconSize">
@@ -123,7 +123,7 @@
                  <double>1.000000000000000</double>
                 </property>
                 <property name="singleStep">
-                 <double>0.100000000000000</double>
+                 <double>0.050000000000000</double>
                 </property>
                 <property name="value">
                  <double>0.250000000000000</double>
@@ -156,10 +156,10 @@
                  <double>1.000000000000000</double>
                 </property>
                 <property name="singleStep">
-                 <double>0.100000000000000</double>
+                 <double>0.050000000000000</double>
                 </property>
                 <property name="value">
-                 <double>0.700000000000000</double>
+                 <double>0.500000000000000</double>
                 </property>
                </widget>
               </item>
@@ -188,8 +188,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>721</width>
-               <height>484</height>
+               <width>767</width>
+               <height>535</height>
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout_4">
